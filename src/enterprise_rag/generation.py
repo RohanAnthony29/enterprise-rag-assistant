@@ -78,23 +78,33 @@ class OllamaGenerator:
         model: str = "llama3.2:3b",
         base_url: str = "http://localhost:11434",
         timeout_seconds: float = 60.0,
+        require_citations: bool = True,
     ):
         self.model = model
         self.endpoint = f"{base_url.rstrip('/')}/api/generate"
         self.timeout_seconds = timeout_seconds
+        self.require_citations = require_citations
 
     def generate(self, question: str, contexts: Sequence[Context]) -> str:
         evidence = "\n\n".join(
             f"[{context.rank}] {context.title}\n{context.text}" for context in contexts
         )
-        prompt = (
-            "Answer the question only from the evidence below. Cite every factual claim "
-            "with one or more bracketed source numbers such as [1]. If the evidence is "
-            "insufficient, say so. Do not invent policies or URLs.\n\n"
-            f"Question: {question}\n\nEvidence:\n{evidence}\n\nAnswer:"
-        )
+        if self.require_citations:
+            instruction = (
+                "Answer the question only from the evidence below. Cite every factual claim "
+                "with one or more bracketed source numbers such as [1]. If the evidence is "
+                "insufficient, say so. Do not invent policies or URLs."
+            )
+        else:
+            instruction = "Use the context below to answer the question concisely."
+        prompt = f"{instruction}\n\nQuestion: {question}\n\nEvidence:\n{evidence}\n\nAnswer:"
         payload = json.dumps(
-            {"model": self.model, "prompt": prompt, "stream": False, "options": {"temperature": 0}}
+            {
+                "model": self.model,
+                "prompt": prompt,
+                "stream": False,
+                "options": {"temperature": 0, "num_predict": 192},
+            }
         ).encode()
         request = urllib.request.Request(
             self.endpoint,

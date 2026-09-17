@@ -1,4 +1,4 @@
-.PHONY: install corpus index evaluate evaluate-hybrid evaluate-answers search serve benchmark test docker-up docker-down
+.PHONY: install corpus index evaluate evaluate-hybrid evaluate-answers evaluate-llm search serve benchmark test docker-up docker-down
 
 install:
 	python3 -m venv .venv
@@ -21,6 +21,9 @@ search:
 
 evaluate-answers:
 	.venv/bin/python scripts/evaluate_answers.py
+
+evaluate-llm:
+	GENERATOR=extractive .venv/bin/python scripts/evaluate_llm.py
 
 serve:
 	.venv/bin/uvicorn enterprise_rag.api:app --host 0.0.0.0 --port 8000
