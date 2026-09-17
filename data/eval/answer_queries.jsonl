@@ -1,0 +1,4 @@
+{"id":"identity-1","question":"What is the role of corporate security identity engineering?","department":"security","expected_terms":["identity","security"],"expected_path":"content/handbook/security/corporate/engineering/identity/_index.md"}
+{"id":"deps-1","question":"How should open-source software dependencies be protected from supply-chain attacks?","department":"security","expected_terms":["dependencies","supply","chain"],"expected_path":"content/handbook/security/best-practices/supply-chain-security-for-dependencies.md"}
+{"id":"chat-1","question":"What are the guidelines for workplace chat communication?","department":"communication","expected_terms":["chat","communication"],"expected_path":"content/handbook/communication/chat.md"}
+{"id":"onboarding-1","question":"What is the employee onboarding process?","department":"people","expected_terms":["onboarding"],"expected_path":"content/handbook/people-group/general-onboarding/_index.md"}

@@ -1,91 +1,144 @@
 # Enterprise RAG Assistant
 
-A production-style Generative AI knowledge assistant built with retrieval-augmented
-generation. The project uses a bounded subset of the public GitLab Handbook as a
-realistic enterprise corpus and preserves document-level metadata for filtering,
-versioning, and citations.
+A production-style enterprise knowledge assistant built with retrieval-augmented
+generation. It ingests a bounded public GitLab Handbook corpus, preserves
+document metadata, combines dense and lexical search, reranks results, and
+returns grounded answers with source citations.
 
-## Current milestone: ingestion and chunking
+The complete default workflow is local and free. Answer synthesis uses a
+deterministic extractive generator; an optional Ollama adapter connects a local
+open-weight LLM without sending enterprise text to a paid API.
 
-The first pipeline:
+## Architecture
 
-1. Discovers Markdown and HTML handbook pages through the public GitLab API.
-2. Selects a balanced subset across People, IT, Engineering, Security, and
-   Communication departments.
-3. Extracts front matter, cleans markup, and assigns deterministic document IDs.
-4. Produces overlapping chunks with inherited metadata and stable chunk IDs.
-5. Writes a version manifest with source, license, counts, and chunk settings.
+```mermaid
+flowchart LR
+    A[GitLab Handbook] --> B[Ingest and clean]
+    B --> C[Metadata-aware chunks]
+    C --> D[MiniLM embeddings]
+    C --> E[BM25 index]
+    D --> F[Exact cosine search]
+    E --> G[Hybrid candidate fusion]
+    F --> G
+    G --> H[Feature reranker]
+    H --> I[Grounded generator]
+    I --> J[Answer and citations]
+    J --> K[FastAPI]
+    K --> L[Prometheus metrics]
+```
 
-Build the initial corpus:
+## What is implemented
+
+- Versioned ingestion, extraction, cleaning, chunking, and metadata propagation.
+- Normalized 384-dimensional `all-MiniLM-L6-v2` embeddings and persisted cosine index.
+- BM25 plus dense candidate retrieval, reciprocal-rank fusion, metadata filters,
+  and a feature-based reranker.
+- Offline Recall@K, MRR@K, and NDCG@K evaluation.
+- Grounded answer generation with numbered citations and an explicit no-evidence response.
+- Optional local Ollama generation with a citation-constrained prompt.
+- FastAPI retrieval and answer endpoints with validation, optional API-key auth,
+  rate limiting, readiness checks, and Prometheus metrics.
+- Docker deployment, concurrent latency benchmark, answer-quality evaluation,
+  unit tests, and GitHub Actions validation.
+
+## Quick start
 
 ```bash
+make install
 make corpus
-```
-
-Outputs are written to `data/processed/corpus-v1/` and intentionally excluded
-from Git. The source content belongs to GitLab and is used under the repository's
-MIT license; every document retains its original source URL and revision.
-
-Run tests:
-
-```bash
-make test
-```
-
-## Metadata contract
-
-Each chunk includes `document_id`, `chunk_id`, title, department, document type,
-source URL, repository revision, access level, chunk index, and word count. These
-fields will support vector-search filtering and citation generation in the next
-milestone.
-
-## Embeddings and retrieval baseline
-
-Create an isolated environment and install the local retrieval dependencies:
-
-```bash
-python3.12 -m venv .venv
-.venv/bin/pip install -r requirements-retrieval.txt
-```
-
-Generate normalized 384-dimensional embeddings with the Apache-2.0 licensed
-`sentence-transformers/all-MiniLM-L6-v2` model and persist the exact cosine
-index:
-
-```bash
 make index
-make evaluate
+make test
+make serve
 ```
 
-Evaluation uses a checked-in, human-readable relevance set. Chunk hits are
-deduplicated to document rankings before macro-averaged Recall@K, MRR@K, and
-NDCG@K are calculated. Generated embeddings and reports are excluded from Git.
+The first embedding run downloads the free Apache-2.0 licensed MiniLM model.
+Open [the API documentation](http://localhost:8000/docs) after starting the server.
 
-Current 26-query baseline:
-
-- Recall@10: `0.9615`
-- MRR@10: `0.8013`
-- NDCG@10: `0.8415`
-- Exact vector-search latency: `0.20 ms` mean and `0.40 ms` p95
-
-See [the retrieval results](docs/RESULTS.md) for the complete table, evaluation
-limitations, and the first diagnosed failure case.
-
-## Hybrid and metadata-aware search
-
-The second retrieval stage combines dense cosine similarity with an in-memory
-BM25 index. Candidate documents are fused with reciprocal rank fusion and
-reranked using dense, lexical, RRF, and title-overlap signals. Both dense and
-lexical retrieval enforce an optional department filter before fusion.
+Ask a question:
 
 ```bash
-make evaluate-hybrid
-make search QUERY="How should open-source dependencies be secured?"
-make search QUERY="How is identity access managed?" DEPARTMENT=security
+curl -s http://localhost:8000/v1/answer \
+  -H 'Content-Type: application/json' \
+  -d '{"question":"How should open-source dependencies be secured?","department":"security"}'
 ```
 
-On the same 26-query development set, hybrid reranking reached Recall@10 of
-`1.0000`, MRR@10 of `0.9295`, and NDCG@10 of `0.9473`. Compared with the dense
-baseline, this is a `12.57%` NDCG@10 improvement and a `27.78%` NDCG@1
-improvement. Hybrid lookup measured `1.37 ms` mean and `1.61 ms` p95, excluding
-query embedding.
+The response contains the answer, ranked citations, generator name, and retrieval,
+generation, and end-to-end latency.
+
+## API
+
+| Endpoint | Purpose |
+|---|---|
+| `GET /health` | Process liveness without loading the model |
+| `GET /ready` | Model and index readiness |
+| `POST /v1/retrieve` | Ranked evidence chunks with metadata filters |
+| `POST /v1/answer` | Grounded answer, citations, and timing |
+| `GET /metrics` | Prometheus-format service metrics |
+
+Set `RAG_API_KEY` to require an `X-API-Key` header. Requests are limited to 60
+per client per minute by default; change `RATE_LIMIT_PER_MINUTE` if needed.
+
+## Optional local LLM
+
+Install Ollama separately, pull a small model, and select the adapter:
+
+```bash
+ollama pull llama3.2:3b
+GENERATOR=ollama OLLAMA_MODEL=llama3.2:3b make serve
+```
+
+The default extractive mode remains useful for deterministic evaluation and
+machines that cannot hold a generative model.
+
+## Evaluation
+
+```bash
+make evaluate
+make evaluate-hybrid
+make evaluate-answers
+make benchmark
+```
+
+The 26-query retrieval set is checked in and human-readable. Generated reports
+are written to `data/reports/`. Current measured retrieval results:
+
+| Metric | Dense baseline | Hybrid + reranking | Relative lift |
+|---|---:|---:|---:|
+| Recall@1 | 0.6731 | 0.8654 | +28.57% |
+| NDCG@1 | 0.6923 | 0.8846 | +27.78% |
+| Recall@10 | 0.9615 | 1.0000 | +4.00% |
+| MRR@10 | 0.8013 | 0.9295 | +16.00% |
+| NDCG@10 | 0.8415 | 0.9473 | +12.57% |
+
+Hybrid index lookup measured 1.37 ms mean and 1.61 ms p95 locally, excluding
+query embedding and generation. See [docs/RESULTS.md](docs/RESULTS.md) for scope
+and limitations. The completed answer path achieved 100% expected-source recall,
+100% citation coverage and validity, and 87.5% expected-keyword recall on the
+four-case answer smoke set. A 20-request, concurrency-4 localhost run achieved
+66.12 requests/second with 59.49 ms mean and 80.94 ms p95 end-to-end latency.
+These are development measurements, not production service-level objectives.
+
+## Docker
+
+Build the corpus and index first, then launch the API:
+
+```bash
+cp .env.example .env
+make docker-up
+curl http://localhost:8000/health
+make docker-down
+```
+
+The index is mounted read-only. Model and API startup are lazy so `/health`
+works before the larger embedding model is loaded; `/ready` performs the load.
+
+## Data and responsible-use notes
+
+Source content remains owned by GitLab and each record retains its source URL
+and repository revision. Generated corpus files, embeddings, model caches, and
+evaluation reports are intentionally excluded from Git. The included evaluation
+set is a development set rather than an independent blind test, so its reported
+lift should not be presented as a universal production guarantee.
+
+The project code is available under the [MIT License](LICENSE). Source documents
+retain their original ownership and licensing.

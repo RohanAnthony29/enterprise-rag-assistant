@@ -50,3 +50,41 @@ query embedding. The additional latency is small for this corpus and buys a
 substantial improvement in first-result relevance. A small development-set
 weight check confirmed the checked-in `0.50/0.30/0.10/0.10` dense, lexical, RRF,
 and title configuration performed better than the tested title-heavier variants.
+
+## Answer generation and service evaluation
+
+The completed assistant selects the strongest chunk from each retrieved document
+and supplies those contexts to a deterministic extractive generator or an
+optional local Ollama model. Both paths return numbered citations mapped to the
+original source URL. The extractive path is the reproducible default because it
+has no paid dependency and does not transmit source text externally.
+
+`scripts/evaluate_answers.py` measures expected-source retrieval, expected-keyword
+coverage, citation coverage, citation validity, and end-to-end latency. These are
+transparent automated proxies, not a substitute for human review. The service
+benchmark in `scripts/benchmark_api.py` reports success rate, throughput, mean,
+p50, p95, and p99 latency after one warm-up request.
+
+Measured API latency is environment-dependent. The local smoke-test result below
+is labeled with its workload and must not be represented as a production
+service-level objective.
+
+### Measured completion run
+
+The final local extractive-answer evaluation used four representative queries
+with department filters:
+
+| Metric | Result |
+|---|---:|
+| Expected-source Recall@5 | 1.0000 |
+| Citation coverage | 1.0000 |
+| Citation validity | 1.0000 |
+| Expected-keyword recall | 0.8750 |
+| Warm answer latency, mean | 31.56 ms |
+| Warm answer latency, p95 | 40.55 ms |
+
+The API load smoke test issued 20 requests at concurrency 4 after model warm-up.
+All requests succeeded, throughput was 66.12 requests/second, mean latency was
+59.49 ms, and p95 latency was 80.94 ms. This run used the local extractive
+generator and a 767-chunk index. The sample sizes are deliberately small and the
+numbers should be re-measured on the eventual deployment target.

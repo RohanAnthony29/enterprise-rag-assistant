@@ -1,0 +1,13 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      INDEX_DIR: /app/artifacts/vector-index-v1
+    volumes:
+      - ./artifacts:/app/artifacts:ro
+    restart: unless-stopped
