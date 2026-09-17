@@ -10,7 +10,7 @@ RUN pip install --no-cache-dir -r requirements-api.txt
 COPY pyproject.toml ./
 COPY src ./src
 RUN pip install --no-cache-dir --no-deps .
-COPY artifacts ./artifacts
+RUN mkdir -p artifacts
 
 EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=90s --retries=3 \

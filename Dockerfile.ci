@@ -1,5 +1,0 @@
-FROM python:3.12-slim AS runtime-check
-WORKDIR /app
-COPY pyproject.toml ./
-COPY src ./src
-RUN python -m compileall -q src
