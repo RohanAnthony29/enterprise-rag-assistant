@@ -70,3 +70,22 @@ Current 26-query baseline:
 
 See [the retrieval results](docs/RESULTS.md) for the complete table, evaluation
 limitations, and the first diagnosed failure case.
+
+## Hybrid and metadata-aware search
+
+The second retrieval stage combines dense cosine similarity with an in-memory
+BM25 index. Candidate documents are fused with reciprocal rank fusion and
+reranked using dense, lexical, RRF, and title-overlap signals. Both dense and
+lexical retrieval enforce an optional department filter before fusion.
+
+```bash
+make evaluate-hybrid
+make search QUERY="How should open-source dependencies be secured?"
+make search QUERY="How is identity access managed?" DEPARTMENT=security
+```
+
+On the same 26-query development set, hybrid reranking reached Recall@10 of
+`1.0000`, MRR@10 of `0.9295`, and NDCG@10 of `0.9473`. Compared with the dense
+baseline, this is a `12.57%` NDCG@10 improvement and a `27.78%` NDCG@1
+improvement. Hybrid lookup measured `1.37 ms` mean and `1.61 ms` p95, excluding
+query embedding.
