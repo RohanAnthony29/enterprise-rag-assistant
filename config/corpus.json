@@ -1,0 +1,18 @@
+{
+  "source": "gitlab_handbook",
+  "project": "gitlab-com/content-sites/handbook",
+  "ref": "main",
+  "max_documents": 120,
+  "department_paths": {
+    "people": "content/handbook/people-group",
+    "people_policies": "content/handbook/people-policies",
+    "corporate_it": "content/handbook/it",
+    "engineering": "content/handbook/engineering",
+    "security": "content/handbook/security",
+    "communication": "content/handbook/communication"
+  },
+  "allowed_extensions": [".md", ".html"],
+  "chunk_size_words": 220,
+  "chunk_overlap_words": 40
+}
+
