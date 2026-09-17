@@ -39,3 +39,34 @@ source URL, repository revision, access level, chunk index, and word count. Thes
 fields will support vector-search filtering and citation generation in the next
 milestone.
 
+## Embeddings and retrieval baseline
+
+Create an isolated environment and install the local retrieval dependencies:
+
+```bash
+python3.12 -m venv .venv
+.venv/bin/pip install -r requirements-retrieval.txt
+```
+
+Generate normalized 384-dimensional embeddings with the Apache-2.0 licensed
+`sentence-transformers/all-MiniLM-L6-v2` model and persist the exact cosine
+index:
+
+```bash
+make index
+make evaluate
+```
+
+Evaluation uses a checked-in, human-readable relevance set. Chunk hits are
+deduplicated to document rankings before macro-averaged Recall@K, MRR@K, and
+NDCG@K are calculated. Generated embeddings and reports are excluded from Git.
+
+Current 26-query baseline:
+
+- Recall@10: `0.9615`
+- MRR@10: `0.8013`
+- NDCG@10: `0.8415`
+- Exact vector-search latency: `0.20 ms` mean and `0.40 ms` p95
+
+See [the retrieval results](docs/RESULTS.md) for the complete table, evaluation
+limitations, and the first diagnosed failure case.

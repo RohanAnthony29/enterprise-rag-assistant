@@ -1,0 +1,27 @@
+{"query_id":"q001","query":"How does the company conduct 360-degree feedback?","relevant_paths":["content/handbook/people-group/360-feedback.md"]}
+{"query_id":"q002","query":"What is acceptable use of company systems and equipment?","relevant_paths":["content/handbook/people-group/acceptable-use-policy.md"]}
+{"query_id":"q003","query":"How should an employee report harassment or inappropriate workplace behavior?","relevant_paths":["content/handbook/people-group/anti-harassment.md"]}
+{"query_id":"q004","query":"How does the company recognize new hires and important life events?","relevant_paths":["content/handbook/people-group/celebrations.md"]}
+{"query_id":"q005","query":"What are the rules for background screening and probation periods?","relevant_paths":["content/handbook/people-group/contracts-probation-periods.md"]}
+{"query_id":"q006","query":"What does directly responsible individual or DRI mean?","relevant_paths":["content/handbook/people-group/directly-responsible-individuals.md"]}
+{"query_id":"q007","query":"What does an onboarding buddy do for a new employee?","relevant_paths":["content/handbook/people-group/general-onboarding/onboarding-buddies.md"]}
+{"query_id":"q008","query":"What guidance should team members follow when giving feedback?","relevant_paths":["content/handbook/people-group/guidance-on-feedback.md"]}
+{"query_id":"q009","query":"What is the employee onboarding process?","relevant_paths":["content/handbook/people-group/general-onboarding/_index.md"]}
+{"query_id":"q010","query":"What are the remote-work requirements for employees in France?","relevant_paths":["content/handbook/people-policies/france-sas/remote-work-charter.md"]}
+{"query_id":"q011","query":"What is the right to disconnect policy for employees in France or Ireland?","relevant_paths":["content/handbook/people-policies/france-sas/right-to-disconnect-charter.md","content/handbook/people-policies/ireland-ltd/right-to-disconnect-policy.md"]}
+{"query_id":"q012","query":"What leave-of-absence policies apply to United States employees?","relevant_paths":["content/handbook/people-policies/leave-of-absence/us.md"]}
+{"query_id":"q013","query":"How is the GitLab Slack application released and its manifest updated?","relevant_paths":["content/handbook/engineering/ai/agent-foundations/ai-catalog/slack-app-release-process.md"]}
+{"query_id":"q014","query":"Where can engineers troubleshoot Agent Foundations problems?","relevant_paths":["content/handbook/engineering/ai/agent-foundations/troubleshooting.md"]}
+{"query_id":"q015","query":"What are the design principles and vision for the AI Catalog?","relevant_paths":["content/handbook/engineering/ai/ai-catalog/ux-principles/_index.md"]}
+{"query_id":"q016","query":"Which engineering group is responsible for Duo CLI?","relevant_paths":["content/handbook/engineering/ai/ai-clients/developer-clients/duo-cli/_index.md"]}
+{"query_id":"q017","query":"What security best practices should be used in Google Cloud?","relevant_paths":["content/handbook/security/best-practices/google-cloud-security-best-practices.md"]}
+{"query_id":"q018","query":"How should open-source software dependencies be protected from supply-chain attacks?","relevant_paths":["content/handbook/security/best-practices/supply-chain-security-for-dependencies.md"]}
+{"query_id":"q019","query":"How are controlled security documents approved and maintained?","relevant_paths":["content/handbook/security/controlled-document-procedure.md"]}
+{"query_id":"q020","query":"What happens to Google Workspace access during employee deprovisioning?","relevant_paths":["content/handbook/security/corporate/automation/google-workspace/deprovisioning/_index.md"]}
+{"query_id":"q021","query":"What does the corporate security devices team manage?","relevant_paths":["content/handbook/security/corporate/engineering/devices/_index.md"]}
+{"query_id":"q022","query":"What is the role of corporate security identity engineering?","relevant_paths":["content/handbook/security/corporate/engineering/identity/_index.md"]}
+{"query_id":"q023","query":"How should an Ask Me Anything session be organized?","relevant_paths":["content/handbook/communication/ask-me-anything.md"]}
+{"query_id":"q024","query":"What confidentiality levels are used for company information?","relevant_paths":["content/handbook/communication/confidentiality-levels.md"]}
+{"query_id":"q025","query":"What are the guidelines for workplace chat communication?","relevant_paths":["content/handbook/communication/chat.md"]}
+{"query_id":"q026","query":"How are company webinars hosted using Zoom?","relevant_paths":["content/handbook/communication/zoom/webinars.md"]}
+

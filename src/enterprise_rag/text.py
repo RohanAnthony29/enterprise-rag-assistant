@@ -72,6 +72,7 @@ def chunk_document(document: Document, size: int, overlap: int) -> list[Chunk]:
                     "document_type": document.document_type,
                     "source": document.source,
                     "source_url": document.source_url,
+                    "repository_path": document.repository_path,
                     "source_revision": document.source_revision,
                     "access_level": document.access_level,
                 },
@@ -81,4 +82,3 @@ def chunk_document(document: Document, size: int, overlap: int) -> list[Chunk]:
             break
         start = end - overlap
     return chunks
-
