@@ -3,6 +3,7 @@
 install:
 	python3 -m venv .venv
 	.venv/bin/pip install -r requirements-api.txt
+	.venv/bin/pip install -e .
 
 corpus:
 	python3 scripts/build_corpus.py

@@ -88,3 +88,30 @@ All requests succeeded, throughput was 66.12 requests/second, mean latency was
 59.49 ms, and p95 latency was 80.94 ms. This run used the local extractive
 generator and a 767-chunk index. The sample sizes are deliberately small and the
 numbers should be re-measured on the eventual deployment target.
+
+## Local LLM comparison
+
+Measured on 2026-09-17 in the 2-core GitHub Codespace with Ollama. The baseline
+used `qwen2.5:0.5b` and a generic context prompt. The optimized path used
+`llama3.2:1b`, the same hybrid retrieval layer, and the citation-constrained
+grounding prompt used by the FastAPI service.
+
+The response-quality score was defined before the run as the unweighted mean of
+expected-keyword recall, evidence-token grounding, citation coverage, and
+citation validity.
+
+| Metric | Qwen baseline | Optimized Llama RAG |
+|---|---:|---:|
+| Expected-keyword recall | 1.0000 | 1.0000 |
+| Evidence-token grounding | 0.7845 | 0.8422 |
+| Citation coverage | 0.0000 | 0.2500 |
+| Citation validity | 0.0000 | 0.2500 |
+| Composite response quality | 0.4461 | 0.5856 |
+| Mean generation latency | 29.57 s | 69.58 s |
+
+The optimized system improved the declared composite score by **31.25%**. The
+small development set and automated token-overlap metric make this directional
+evidence, not a universal quality claim. Citation compliance also remained a
+clear failure mode for this very small model. The Llama generator was separately
+served through `POST /v1/answer`; a warm CPU request returned successfully with
+three retrieved citations in 22.32 seconds.

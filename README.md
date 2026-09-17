@@ -90,12 +90,28 @@ GENERATOR=ollama OLLAMA_MODEL=llama3.2:3b make serve
 The default extractive mode remains useful for deterministic evaluation and
 machines that cannot hold a generative model.
 
+### Measured local-LLM experiment
+
+The LLM path was exercised end to end in the 2-core CPU Codespace using Ollama.
+A baseline `qwen2.5:0.5b` pipeline with a generic context prompt was compared
+against `llama3.2:1b` with the citation-constrained grounded prompt. On the four
+checked-in answer cases, the predefined composite response-quality score
+increased from `0.4461` to `0.5856`, a **31.25% relative improvement**.
+
+The score is the unweighted mean of expected-keyword recall, evidence-token
+grounding, citation coverage, and citation validity. The optimized pipeline
+retained 100% keyword recall and increased evidence-token grounding from 78.45%
+to 84.22%. Citation compliance was only 25% for the 1B model, which is recorded
+as a known failure case rather than hidden. A warm LLM request was also verified
+through `POST /v1/answer`, returning three citations in 22.32 seconds on CPU.
+
 ## Evaluation
 
 ```bash
 make evaluate
 make evaluate-hybrid
 make evaluate-answers
+make evaluate-llm
 make benchmark
 ```
 
